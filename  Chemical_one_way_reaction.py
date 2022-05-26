@@ -14,10 +14,21 @@ def main():
     price_react = 1000          # [円/s]
     dt = 0.001
     t_max = 200
-    psuedo_first_order_reaction_analysis(k,nA_initial,nB_initial,price_A,price_B,price_C,price_separate,price_react,t_max,dt)
-    # second_order_reaction_A2_analysis(k,nA_initial,price_A,price_C,price_separate,price_react,t_max,dt)
-    second_order_reaction_AB_analysis(k/nB_initial,nA_initial,nB_initial,price_A,price_B,price_C,price_separate,price_react,t_max,dt)
 
+    #グラフを作成するのに用いる?
+    t_list = np.arange(0,t_max+dt,dt)
+
+    #疑一次反応のモデルにおけるA,B,Cの物質量と精製までの時間による利益の変化
+    pusuedo = psuedo_first_order_reaction_analysis(k,nA_initial,nB_initial,price_A,price_B,price_C,price_separate,price_react,t_max,dt)
+    pusuedo_NA,pusuedo_NB,pusuedo_NC,pusuedo_profit = pusuedo[0],pusuedo[1],pusuedo[2],pusuedo[3]
+
+    #同種間二次反応のモデルにおけるA,Cの物質量と精製までの時間による利益の変化
+    second_A2 = second_order_reaction_A2_analysis(k,nA_initial,price_A,price_C,price_separate,price_react,t_max,dt)
+    second_A2_NA,second_A2_NC,second_A2_profit = second_A2[0],second_A2[1],second_A2[2]
+
+    #異種間二次反応のモデルにおけるA,B,Cの物質量と精製までの時間による利益の変化
+    second_AB = second_order_reaction_AB_analysis(k/nB_initial,nA_initial,nB_initial,price_A,price_B,price_C,price_separate,price_react,t_max,dt)
+    second_AB_NA,second_AB_NB,second_AB_NC,second_AB_profit = second_AB[0],second_AB[1],second_AB[2],second_AB[3]
 
     #make figure
     plt.legend()
@@ -35,16 +46,11 @@ def psuedo_first_order_reaction_analysis(K,NA_initial,NB_initial,Price_A,Price_B
         T = T_list[T_index]
         Produce_Cost[T_index] = NA_initial*Price_A+NB_initial*Price_B+(NA[T_index]+NB[T_index])*Price_separate+Price_react*T
         C_profit[T_index] = NC[T_index]*Price_C - Produce_Cost[T_index]
-        C_profit_max = np.max(C_profit)
-    Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
-    print("the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
+    #     C_profit_max = np.max(C_profit)
+    # Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
+    # print("the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
 
-
-    # plt.scatter(T_list,C_profit,label ="C_profit",s=0.01)
-    # plt.scatter(Profit_max_T,C_profit_max,s=0.2,c="r")
-
-    plt.scatter(T_list,NC,label="NC_pusuedo_A",s=0.01)
-    plt.scatter(T_list,NA,label="NA_pusuedo_A",s=0.01)
+    return NA,NB,NC,C_profit
 
 
 def second_order_reaction_AB_analysis(K,NA_initial,NB_initial,Price_A,Price_B,Price_C,Price_separate,Price_react,T_max,Dt) :
@@ -66,16 +72,11 @@ def second_order_reaction_AB_analysis(K,NA_initial,NB_initial,Price_A,Price_B,Pr
         T = T_list[T_index]
         Produce_Cost[T_index] = NA_initial*Price_A+NB_initial*Price_B+(NA[T_index]+NB[T_index])*Price_separate+Price_react*T
         C_profit[T_index] = NC[T_index]*Price_C - Produce_Cost[T_index]
-        C_profit_max = np.max(C_profit)
-    Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
-    print("the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
+    #     C_profit_max = np.max(C_profit)
+    # Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
+    # print("In the second order model of A and B, the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
 
-
-    # plt.scatter(T_list,C_profit,label ="C_profit",s=0.01)
-    # plt.scatter(Profit_max_T,C_profit_max,s=0.2,c="r")
-
-    plt.scatter(T_list,NC,label="NC_AB",s=0.01)
-    plt.scatter(T_list,NA,label="NA_AB",s=0.01)
+    return NA,NB,NC,C_profit
 
 
 
@@ -90,15 +91,11 @@ def second_order_reaction_A2_analysis(K,NA_initial,Price_A,Price_C,Price_separat
         T = T_list[T_index]
         Produce_Cost[T_index] = NA_initial*Price_A+(NA[T_index])*Price_separate+Price_react*T
         C_profit[T_index] = NC[T_index]*Price_C - Produce_Cost[T_index]
-        C_profit_max = np.max(C_profit)
-    Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
-    print("the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
+    #     C_profit_max = np.max(C_profit)
+    # Profit_max_T = float((np.where(C_profit == C_profit_max)[0])*Dt)
+    # print("In the second order model of A, the maximum of C_profit is "+str(C_profit_max)+" that is when t is "+str(Profit_max_T))
 
-
-    # plt.scatter(T_list,C_profit,label ="C_profit",s=0.01)
-    # plt.scatter(Profit_max_T,C_profit_max,s=0.2,c="r")
-    plt.scatter(T_list,NC,label="NC_A2",s=0.01)
-    plt.scatter(T_list,NA,label="NA_A2",s=0.01)
+    return NA,NC,C_profit
 
 
 
